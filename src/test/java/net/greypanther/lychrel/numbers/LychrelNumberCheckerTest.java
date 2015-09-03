@@ -1,4 +1,4 @@
-package net.greypanther;
+package net.greypanther.lychrel.numbers;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import net.greypanther.lychrel.numbers.LychrelNumberChecker;
 
 @RunWith(Parameterized.class)
 public final class LychrelNumberCheckerTest {

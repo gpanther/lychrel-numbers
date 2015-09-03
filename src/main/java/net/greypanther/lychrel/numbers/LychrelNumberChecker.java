@@ -1,57 +1,67 @@
-package net.greypanther;
+package net.greypanther.lychrel.numbers;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 final class LychrelNumberChecker {
+    private static final long MAX_NUMBER_OF_DIGITS = 1000 * 1000 * 1000;
+
     private LychrelNumberChecker() {
         throw new UnsupportedOperationException("Should never be instantiated");
     }
 
     static Result check(long seed, long maxIterationCount) {
-        DigitStore digits1 = new DigitStore();
-        DigitStore digits2 = new DigitStore();
+        DigitStore digits = new DigitStore();
+        FastBitSet hadCarry = new FastBitSet(MAX_NUMBER_OF_DIGITS);
 
-        copy(seed, digits1);
+        copy(seed, digits);
 
-        for (long i = 0; i < maxIterationCount; ++i) {
-            if (isPalindrome(digits1)) {
-                return new Result(true, i, digits1.getDigitLength());
+        for (long iterationIndex = 0; iterationIndex < maxIterationCount; ++iterationIndex) {
+            if (isPalindrome(digits)) {
+                return new Result(true, iterationIndex, digits.getDigitLength());
             }
 
-            if ((i & 1023) == 0) {
-                System.out.format("Iteration %,d, digit length %,d\n", i, digits1.getDigitLength());
+            if ((iterationIndex & 1023) == 0) {
+                System.out.println("Iteration " + iterationIndex + " digit length " + digits.getDigitLength());
             }
 
-            long length = digits1.getDigitLength();
-            long k = length - 1;
+            long length = digits.getDigitLength();
+            long antipodeDigitIndex = length - 1;
+            long halfLength = isEven(length) ? length / 2 : length / 2 + 1;
             int carry = 0;
 
-            for (long j = 0; j < length; ++j) {
-                int d1 = digits1.get(j);
-                int d2 = digits1.get(k--);
+            for (long j = 0; j < halfLength; ++j) {
+                int d2 = digits.get(antipodeDigitIndex--);
+                hadCarry.set(j, carry > 0);
+                carry = digits.addToDigitAt(j, d2 + carry);
+                assert carry == 0 | carry == 1;
+            }
 
-                int digit = d1 + d2 + carry;
-                if (digit >= 10) {
-                    carry = digit / 10;
-                    digit = digit % 10;
-                } else {
-                    carry = 0;
+            for (long j = halfLength; j < length; ++j) {
+                int d1 = digits.get(j);
+                int d2 = digits.get(antipodeDigitIndex);
+                d2 -= d1;
+                if (hadCarry.get(antipodeDigitIndex)) {
+                    d2 -= 1;
                 }
-                digits2.set(j, digit);
+                if (d2 < 0) {
+                    d2 += 10;
+                }
+                assert d2 >= 0 & d2 <= 9;
+                carry = digits.addToDigitAt(j, d2 + carry);
+                antipodeDigitIndex--;
             }
 
             if (carry > 0) {
-                digits2.set(length, carry);
-                digits2.setDigitLength(length + 1);
-            } else {
-                digits2.setDigitLength(length);
+                digits.append(carry);
             }
-
-            digits1.copyFrom(digits2);
         }
 
-        return new Result(false, maxIterationCount, digits1.getDigitLength());
+        return new Result(false, maxIterationCount, digits.getDigitLength());
+    }
+
+    private static boolean isEven(long value) {
+        return (value & 1) == 0;
     }
 
     private static void copy(long seed, DigitStore digits) {
@@ -130,7 +140,7 @@ final class LychrelNumberChecker {
         private final static int LOW_MASK = Integer.parseInt("00001111", 2);
         private final static int HIGH_MASK = Integer.parseInt("11110000", 2);
 
-        private final byte[] digits = new byte[4096];
+        private final byte[] digits = new byte[(int) (MAX_NUMBER_OF_DIGITS / 2)];
         private long digitLength;
 
         int get(long index) {
@@ -141,6 +151,38 @@ final class LychrelNumberChecker {
             } else {
                 return b >>> 4;
             }
+        }
+
+        int addToDigitAt(long index, int toAdd) {
+            int carry;
+
+            int byteIndex = (int) (index >>> 1);
+            int b = digits[byteIndex] & 0xFF;
+            if ((index & 1) == 0) {
+                // inlined get
+                int digit = (b & LOW_MASK) + toAdd;
+                if (digit >= 10) {
+                    carry = digit / 10;
+                    digit = digit % 10;
+                } else {
+                    carry = 0;
+                }
+                // inlined set
+                digits[byteIndex] = (byte) ((b & HIGH_MASK) | digit);
+            } else {
+                // inlined get
+                int digit = (b >>> 4) + toAdd;
+                if (digit >= 10) {
+                    carry = digit / 10;
+                    digit = digit % 10;
+                } else {
+                    carry = 0;
+                }
+                // inlined set
+                digits[byteIndex] = (byte) ((digit << 4) | (b & LOW_MASK));
+            }
+
+            return carry;
         }
 
         void set(long index, int digit) {
@@ -161,21 +203,8 @@ final class LychrelNumberChecker {
             digitLength++;
         }
 
-        void copyFrom(DigitStore other) {
-            int byteCount = (int) (other.digitLength / 2);
-            if (other.digitLength % 2 > 0) {
-                byteCount += 1;
-            }
-            System.arraycopy(other.digits, 0, digits, 0, byteCount);
-            digitLength = other.digitLength;
-        }
-
         long getDigitLength() {
             return digitLength;
-        }
-
-        void setDigitLength(long digitLength) {
-            this.digitLength = digitLength;
         }
 
         @Override
@@ -185,6 +214,32 @@ final class LychrelNumberChecker {
                 result[i] = (char) ('0' + get(digitLength - i - 1));
             }
             return new String(result);
+        }
+    }
+
+    private static final class FastBitSet {
+        private final long[] bits;
+
+        private FastBitSet(long maximumEntry) {
+            this.bits = new long[(int) (maximumEntry / Long.SIZE + 1)];
+        }
+
+        boolean get(long index) {
+            int arrayIndex = (int) (index >>> 64);
+            int bitIndex = (int) (index & 63);
+            long mask = 1L << bitIndex;
+            return (bits[arrayIndex] & mask) != 0;
+        }
+
+        void set(long index, boolean value) {
+            int arrayIndex = (int) (index >>> 64);
+            int bitIndex = (int) (index & 63);
+            long mask = 1L << bitIndex;
+            if (value) {
+                bits[arrayIndex] |= mask;
+            } else {
+                bits[arrayIndex] &= ~mask;
+            }
         }
     }
 }

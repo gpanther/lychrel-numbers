@@ -1,4 +1,4 @@
-package net.greypanther;
+package net.greypanther.lychrel.numbers;
 
 public final class Main {
     public static void main(String[] args) {
