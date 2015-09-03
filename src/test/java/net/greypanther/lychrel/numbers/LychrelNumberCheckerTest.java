@@ -10,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import net.greypanther.lychrel.numbers.LychrelNumberChecker;
-
 @RunWith(Parameterized.class)
 public final class LychrelNumberCheckerTest {
     private final long seed;
@@ -25,9 +23,33 @@ public final class LychrelNumberCheckerTest {
     }
 
     @Test
-    public void testLychrelNumberChecker() {
-        LychrelNumberChecker.Result result = LychrelNumberChecker.check(seed, iterationCount + 1);
-        assertEquals(new LychrelNumberChecker.Result(true, iterationCount, digitCount), result);
+    public void testBigIntegerChecker() {
+        Result result = BigIntegerChecker.check(seed, iterationCount + 1);
+        assertEquals(new Result(true, iterationCount, digitCount), result);
+    }
+
+    @Test
+    public void testByteArrayChecker() {
+        Result result = new ByteArrayChecker().check(seed, iterationCount + 1);
+        assertEquals(new Result(true, iterationCount, digitCount), result);
+    }
+
+    @Test
+    public void testCompactDigitStoreChecker() {
+        Result result = new CompactDigitStoreChecker().check(seed, iterationCount + 1);
+        assertEquals(new Result(true, iterationCount, digitCount), result);
+    }
+
+    @Test
+    public void testCompactDigitStoreCheckerWithInlining() {
+        Result result = new CompactDigitStoreCheckerWithInlining().check(seed, iterationCount + 1);
+        assertEquals(new Result(true, iterationCount, digitCount), result);
+    }
+
+    @Test
+    public void testCompactDigitStoreCheckerWithAlternativeCarryCheck() {
+        Result result = new CompactDigitStoreCheckerWithAlternativeCarryCheck().check(seed, iterationCount + 1);
+        assertEquals(new Result(true, iterationCount, digitCount), result);
     }
 
     @Parameters(name = "{0} should be a palyndrom after {1} iteration(s)")
