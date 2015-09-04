@@ -1,7 +1,7 @@
 package net.greypanther.lychrel.numbers;
 
-abstract class CheckerWithDigitStore {
-    final Result check(long seed, long maxIterationCount) {
+public abstract class CheckerWithDigitStore {
+    public final Result check(long seed, long maxIterationCount) {
         init(seed);
 
         for (long iterationIndex = 0; iterationIndex < maxIterationCount; ++iterationIndex) {
@@ -9,7 +9,7 @@ abstract class CheckerWithDigitStore {
                 return new Result(true, iterationIndex, getDigitsCount());
             }
 
-            if ((iterationIndex & 1023) == 0) {
+            if ((iterationIndex & 1023) == 0 & iterationIndex != 0) {
                 System.out.format("Iteration: %,d / Digit count: %,d\n", iterationIndex, getDigitsCount());
             }
 

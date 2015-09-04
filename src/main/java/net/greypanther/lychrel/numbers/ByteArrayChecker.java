@@ -2,7 +2,7 @@ package net.greypanther.lychrel.numbers;
 
 import java.util.BitSet;
 
-final class ByteArrayChecker extends CheckerWithDigitStore {
+public final class ByteArrayChecker extends CheckerWithDigitStore {
     private static final int MAX_NUMBER_OF_DIGITS = 1024 * 1024;
 
     private final byte[] bytes = new byte[MAX_NUMBER_OF_DIGITS];

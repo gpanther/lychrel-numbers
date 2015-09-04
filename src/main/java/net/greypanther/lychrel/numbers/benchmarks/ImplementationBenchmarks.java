@@ -1,7 +1,14 @@
-package net.greypanther.lychrel.numbers;
+package net.greypanther.lychrel.numbers.benchmarks;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+
+import net.greypanther.lychrel.numbers.BigIntegerChecker;
+import net.greypanther.lychrel.numbers.ByteArrayChecker;
+import net.greypanther.lychrel.numbers.CheckerWithDigitStore;
+import net.greypanther.lychrel.numbers.CompactDigitStoreChecker;
+import net.greypanther.lychrel.numbers.CompactDigitStoreCheckerWithAlternativeCarryCheck;
+import net.greypanther.lychrel.numbers.CompactDigitStoreCheckerWithInlining;
 
 public class ImplementationBenchmarks {
     private static final int MAX_VALUE_TO_CHECK = 1000;

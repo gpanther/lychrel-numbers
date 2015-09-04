@@ -2,12 +2,12 @@ package net.greypanther.lychrel.numbers;
 
 import java.math.BigInteger;
 
-final class BigIntegerChecker {
+public final class BigIntegerChecker {
     private BigIntegerChecker() {
         throw new UnsupportedOperationException("Should never be instantiated");
     }
 
-    static Result check(long seed, long maxIterationCount) {
+    public static Result check(long seed, long maxIterationCount) {
         BigInteger value = BigInteger.valueOf(seed);
 
         int longestLength = 0;

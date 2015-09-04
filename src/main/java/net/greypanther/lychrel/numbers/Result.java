@@ -3,37 +3,37 @@ package net.greypanther.lychrel.numbers;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
-final class Result {
-    private final boolean isLychrelNumber;
+public final class Result {
+    private final boolean cycleFound;
     private final long iterationCount, digitLength;
 
-    Result(boolean isLychrelNumber, long iterationCount, long digitLength) {
-        this.isLychrelNumber = isLychrelNumber;
+    Result(boolean cycleFound, long iterationCount, long digitLength) {
+        this.cycleFound = cycleFound;
         this.iterationCount = iterationCount;
         this.digitLength = digitLength;
     }
 
-    boolean isLychrelNumber() {
-        return isLychrelNumber;
+    public boolean wasCycleFound() {
+        return cycleFound;
     }
 
-    long getIterationCount() {
+    public long getIterationCount() {
         return iterationCount;
     }
 
-    long getDigitLength() {
+    public long getDigitLength() {
         return digitLength;
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("result", isLychrelNumber).add("iterationCount", iterationCount)
+        return MoreObjects.toStringHelper(this).add("result", cycleFound).add("iterationCount", iterationCount)
                 .add("digitCount", digitLength).toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(isLychrelNumber, iterationCount, digitLength);
+        return Objects.hashCode(cycleFound, iterationCount, digitLength);
     }
 
     @Override
@@ -45,7 +45,7 @@ final class Result {
             return false;
         }
         Result that = (Result) o;
-        return this.isLychrelNumber == that.isLychrelNumber & this.iterationCount == that.iterationCount
+        return this.cycleFound == that.cycleFound & this.iterationCount == that.iterationCount
                 & this.digitLength == that.digitLength;
     }
 }

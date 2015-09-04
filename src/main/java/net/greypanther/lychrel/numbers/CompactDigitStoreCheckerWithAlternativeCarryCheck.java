@@ -1,6 +1,6 @@
 package net.greypanther.lychrel.numbers;
 
-final class CompactDigitStoreCheckerWithAlternativeCarryCheck extends CheckerWithDigitStore {
+public final class CompactDigitStoreCheckerWithAlternativeCarryCheck extends CheckerWithDigitStore {
     private static final long MAX_NUMBER_OF_DIGITS = 1024 * 1024;
 
     private final DigitStore digits = new DigitStore();

@@ -1,4 +1,6 @@
-package net.greypanther.lychrel.numbers;
+package net.greypanther.lychrel.numbers.main;
+
+import net.greypanther.lychrel.numbers.CompactDigitStoreCheckerWithInlining;
 
 public final class Check196 {
     public static void main(String[] args) {
